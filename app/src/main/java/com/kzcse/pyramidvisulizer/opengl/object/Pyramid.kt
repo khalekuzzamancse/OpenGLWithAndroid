@@ -1,11 +1,51 @@
-package com.kzcse.pyramidvisulizer.opengl;
+package com.kzcse.pyramidvisulizer.opengl.`object`;
 
 
 import android.opengl.GLES30
+import android.opengl.Matrix
 import android.util.Log
+import com.kzcse.pyramidvisulizer.opengl.Colors
+import com.kzcse.pyramidvisulizer.opengl.renderer.Renderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+class PyramidRenderer {
+    private val pyramidModelMatrix = FloatArray(16)
+    private val pyramidMVPMatrix = FloatArray(16)
+
+    init {
+        initializeModelMatrix()
+    }
+
+    private fun initializeModelMatrix() {
+        Matrix.setIdentityM(pyramidModelMatrix, 0)
+    }
+
+    private fun setPosition() {
+        Matrix.setIdentityM(pyramidModelMatrix, 0)
+        Matrix.translateM(pyramidModelMatrix, 0, -2f, 0f, 0f)
+    }
+
+    private fun setScale() {
+        Matrix.scaleM(pyramidModelMatrix, 0, 2.0f, 2.0f, 2.0f)
+    }
+
+    private fun applyGlobalTransformations(globalTransformMatrix: FloatArray) {
+        Matrix.multiplyMM(pyramidModelMatrix, 0, globalTransformMatrix, 0, pyramidModelMatrix, 0)
+    }
+
+    private fun computeMVPMatrix(vpMatrix: FloatArray) {
+        Matrix.multiplyMM(pyramidMVPMatrix, 0, vpMatrix, 0, pyramidModelMatrix, 0)
+    }
+
+    fun draw(vpMatrix: FloatArray, globalTransformMatrix: FloatArray, pyramid: Pyramid) {
+        setPosition()
+        setScale()
+        applyGlobalTransformations(globalTransformMatrix)
+        computeMVPMatrix(vpMatrix)
+        pyramid.draw(pyramidMVPMatrix)
+    }
+}
 
 class Pyramid {
 

@@ -1,11 +1,50 @@
-package com.kzcse.pyramidvisulizer.opengl
+package com.kzcse.pyramidvisulizer.opengl.`object`
 
 
 import android.opengl.GLES30
+import android.opengl.Matrix
 import android.util.Log
+import com.kzcse.pyramidvisulizer.opengl.renderer.Renderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+class SunRenderer {
+    private val sunModelMatrix = FloatArray(16)
+    private val sunMVPMatrix = FloatArray(16)
+
+    init {
+        initializeModelMatrix()
+    }
+
+    private fun initializeModelMatrix() {
+        Matrix.setIdentityM(sunModelMatrix, 0)
+    }
+
+    private fun setPosition() {
+        Matrix.setIdentityM(sunModelMatrix, 0)
+        Matrix.translateM(sunModelMatrix, 0, 0f, 3f, -5f)
+    }
+
+    private fun setScale() {
+        Matrix.scaleM(sunModelMatrix, 0, 3f, 3f, 3f)
+    }
+
+    private fun applyGlobalTransformations(globalTransformMatrix: FloatArray) {
+        Matrix.multiplyMM(sunModelMatrix, 0, globalTransformMatrix, 0, sunModelMatrix, 0)
+    }
+
+    private fun computeMVPMatrix(vpMatrix: FloatArray) {
+        Matrix.multiplyMM(sunMVPMatrix, 0, vpMatrix, 0, sunModelMatrix, 0)
+    }
+
+    fun draw(vpMatrix: FloatArray, globalTransformMatrix: FloatArray, sun: Sun) {
+        setPosition()
+        setScale()
+        applyGlobalTransformations(globalTransformMatrix)
+        computeMVPMatrix(vpMatrix)
+        sun.draw(sunMVPMatrix)
+    }
+}
 
 class Sun {
 
@@ -61,9 +100,13 @@ class Sun {
         val vertices = mutableListOf<Float>()
         val colors = mutableListOf<Float>()
         val colorList = listOf(
-            Colors.red, Colors.green, Colors.blue, Colors.yellow,
-            Colors.cyan, Colors.magenta, Colors.gray, Colors.white
+            floatArrayOf(1.0f, 1.0f, 0.5f, 1.0f),  // Bright yellow for the core
+            floatArrayOf(1.0f, 0.95f, 0.4f, 1.0f), // Slightly dimmer yellow
+            floatArrayOf(1.0f, 0.9f, 0.3f, 1.0f),  // Dimmer yellow as you move outward
+            floatArrayOf(1.0f, 0.85f, 0.2f, 1.0f)  // Soft, faded yellow for the outer edge
         )
+
+
 
         for (i in 0 until stacks) {
             val lat0 = Math.PI * (-0.5 + i.toDouble() / stacks)

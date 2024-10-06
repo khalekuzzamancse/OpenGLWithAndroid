@@ -1,10 +1,49 @@
-package com.kzcse.pyramidvisulizer.opengl
+package com.kzcse.pyramidvisulizer.opengl.`object`
 
 import android.opengl.GLES30
+import android.opengl.Matrix
 import android.util.Log
+import com.kzcse.pyramidvisulizer.opengl.renderer.Renderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+class CactusRenderer {
+    private val cactusModelMatrix = FloatArray(16)
+    private val cactusMVPMatrix = FloatArray(16)
+
+    init {
+        initializeModelMatrix()
+    }
+
+    private fun initializeModelMatrix() {
+        Matrix.setIdentityM(cactusModelMatrix, 0)
+    }
+
+    private fun setPosition() {
+        Matrix.setIdentityM(cactusModelMatrix, 0)
+        Matrix.translateM(cactusModelMatrix, 0, 2f, 0f, 0f)
+    }
+
+    private fun setScale() {
+        Matrix.scaleM(cactusModelMatrix, 0, 0.7f, 0.7f, 0.7f)
+    }
+
+    private fun applyGlobalTransformations(globalTransformMatrix: FloatArray) {
+        Matrix.multiplyMM(cactusModelMatrix, 0, globalTransformMatrix, 0, cactusModelMatrix, 0)
+    }
+
+    private fun computeMVPMatrix(vpMatrix: FloatArray) {
+        Matrix.multiplyMM(cactusMVPMatrix, 0, vpMatrix, 0, cactusModelMatrix, 0)
+    }
+
+    fun draw(vpMatrix: FloatArray, globalTransformMatrix: FloatArray, cactus: Cactus) {
+        setPosition()
+        setScale()
+        applyGlobalTransformations(globalTransformMatrix)
+        computeMVPMatrix(vpMatrix)
+        cactus.draw(cactusMVPMatrix)
+    }
+}
 
 class Cactus {
 

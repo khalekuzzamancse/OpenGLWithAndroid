@@ -1,4 +1,4 @@
-package com.kzcse.pyramidvisulizer.opengl;
+package com.kzcse.pyramidvisulizer.opengl.renderer;
 class Transform {
     var scale = 1.0f
     var angleX = 0.0f
