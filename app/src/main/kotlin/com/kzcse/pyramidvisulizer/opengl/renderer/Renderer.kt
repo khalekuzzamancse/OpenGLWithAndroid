@@ -1,5 +1,5 @@
-
 @file:Suppress("unused")
+
 package com.kzcse.pyramidvisulizer.opengl.renderer
 
 
@@ -25,12 +25,12 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceCreated(glUnused: GL10?, config: EGLConfig?) {
-        setBackground(0.96f, 0.87f, 0.70f, 1.0f)
+        setBackground()
         sceneManager.initializeScene()
     }
 
     override fun onSurfaceChanged(glUnused: GL10?, width: Int, height: Int) {
-        configureViewport( width, height)
+        configureViewport(width, height)
         setupProjectionMatrix(width, height)
     }
 
@@ -51,28 +51,39 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
     fun rotateY() = transformationManager.rotateY()
     fun rotateZ() = transformationManager.rotateZ()
     fun setTranslation(x: Float, y: Float) = transformationManager.setTranslation(x, y)
-    fun setX(x: Float) =
-        transformationManager.setTranslation(x, transformationManager.getTranslationY())
-
-    fun getX(): Float = transformationManager.getTranslationX()
-    fun setY(y: Float) =
-        transformationManager.setTranslation(transformationManager.getTranslationX(), y)
-
-    fun getY(): Float = transformationManager.getTranslationY()
 
 
-    //TODO:Helper methods
+    var x: Float
+        get() = transformationManager.getTranslationX()
+        set(value) {
+            transformationManager.setTranslation(value, transformationManager.getTranslationY())
+        }
+
+    var y: Float
+        get() = transformationManager.getTranslationY()
+        set(value) {
+            transformationManager.setTranslation(transformationManager.getTranslationX(), value)
+        }
+
+
+
+
+
+
+
+
+
+    //TODO:Helper methods---------TODO:Helper methods
+    //TODO:Helper methods---------TODO:Helper methods
+    //TODO:Helper methods---------TODO:Helper methods
     /**
      * Sets the OpenGL clear color, which defines the background color of the rendering surface.
      *
-     * @param red The red component of the clear color (0.0 to 1.0).
-     * @param green The green component of the clear color (0.0 to 1.0).
-     * @param blue The blue component of the clear color (0.0 to 1.0).
-     * @param alpha The alpha component of the clear color (0.0 to 1.0).
      */
-    private fun setBackground(red: Float, green: Float, blue: Float, alpha: Float) {
-        GLES30.glClearColor(red, green, blue, alpha)
+    private fun setBackground() {
+        GLES30.glClearColor(0.96f, 0.87f, 0.70f, 1.0f)
     }
+
     /**
      * Initializes the scene objects and other components required for rendering.
      * This typically includes setting up the 3D objects, textures, and shaders that will be rendered.

@@ -22,15 +22,15 @@ class SurfaceView(context: Context) : GLSurfaceView(context) {
     private var mPreviousY = 0f
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val x: Float = event.getX()
-        val y: Float = event.getY()
+        val x: Float = event.x
+        val y: Float = event.y
         when (event.action) {
             MotionEvent.ACTION_MOVE -> {
                 val dx = x - mPreviousX
                 //subtract, so the cube moves the same direction as your finger with plus it moves the opposite direction.
-                renderer.setX(renderer.getX() - (dx * TOUCH_SCALE_FACTOR))
+                renderer.x -= (dx * TOUCH_SCALE_FACTOR)
                 val dy = y - mPreviousY
-                renderer.setY(renderer.getY() - (dy *TOUCH_SCALE_FACTOR))
+                renderer.y -= (dy * TOUCH_SCALE_FACTOR)
             }
         }
         mPreviousX = x
