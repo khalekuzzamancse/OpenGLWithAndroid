@@ -27,6 +27,20 @@ class SceneManager {
         cactus = Cactus()
     }
 
+    fun movePyramid(x:Float,y:Float){
+        pyramidRenderer.x=x
+        pyramidRenderer.y=y
+    }
+
+    fun isPyramidTouched(vpMatrix: FloatArray, touchX: Float, touchY: Float, screenWidth: Int, screenHeight: Int)=
+        pyramidRenderer.isPyramidTouched(
+            vpMatrix = vpMatrix,
+            touchX = touchX,
+            touchY = touchY,
+            screenWidth = screenWidth,
+            screenHeight = screenHeight
+        )
+
     fun drawSceneObjects(vpMatrix: FloatArray, globalTransformMatrix: FloatArray) {
         sandDunesRenderer.draw(vpMatrix, globalTransformMatrix, sandDunes)
         sunRenderer.draw(vpMatrix, globalTransformMatrix, sun)

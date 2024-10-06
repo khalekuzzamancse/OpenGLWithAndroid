@@ -32,6 +32,9 @@ class SurfaceView(context: Context) : GLSurfaceView(context) {
                 val dy = y - mPreviousY
                 renderer.y -= (dy * TOUCH_SCALE_FACTOR)
             }
+            MotionEvent.ACTION_DOWN -> {
+               renderer.onCanvasTapped(x, y)
+            }
         }
         mPreviousX = x
         mPreviousY = y

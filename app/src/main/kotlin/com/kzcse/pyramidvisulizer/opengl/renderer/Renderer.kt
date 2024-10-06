@@ -16,6 +16,9 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
     private val setupHelper = RenderSetupHelper()
     private val mProjectionMatrix = FloatArray(16)
     private val mViewMatrix = FloatArray(16)
+    private lateinit var vpMatrix: FloatArray
+    private  var screenWidth:Int=0
+    private  var screenHeight:Int=0
 
     companion object {
         private const val Z_NEAR = 1f
@@ -30,6 +33,8 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(glUnused: GL10?, width: Int, height: Int) {
+        screenWidth=width
+        screenHeight=height
         configureViewport(width, height)
         setupProjectionMatrix(width, height)
     }
@@ -39,7 +44,7 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
         setupHelper.clearBuffersAndEnableDepthTest()
         setupHelper.setupViewMatrix(mViewMatrix)
         val globalTransformMatrix = transformationManager.applyGlobalTransformations()
-        val vpMatrix = setupHelper.createVPMatrix(mProjectionMatrix, mViewMatrix)
+        vpMatrix = setupHelper.createVPMatrix(mProjectionMatrix, mViewMatrix)
 
         sceneManager.drawSceneObjects(vpMatrix, globalTransformMatrix)
     }
@@ -50,8 +55,11 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
     fun rotateX() = transformationManager.rotateX()
     fun rotateY() = transformationManager.rotateY()
     fun rotateZ() = transformationManager.rotateZ()
-    fun setTranslation(x: Float, y: Float) = transformationManager.setTranslation(x, y)
 
+    fun setTranslation(x: Float, y: Float) {
+        //transformationManager.setTranslation(x, y)
+        sceneManager.movePyramid(x, y)
+    }
 
     var x: Float
         get() = transformationManager.getTranslationX()
@@ -66,12 +74,21 @@ class Renderer(context: Context) : GLSurfaceView.Renderer {
         }
 
 
+    fun onCanvasTapped(x: Float, y: Float) {
+        // Handle the tap and get the touch position
+        println(
+            "TappedPosition: ($x, $y):${
+                sceneManager.isPyramidTouched(
+                    vpMatrix = vpMatrix,
+                    touchX = x,
+                    touchY = y,
+                    screenWidth = screenWidth,
+                    screenHeight = screenHeight
+                )
+            }"
+        )
 
-
-
-
-
-
+    }
 
     //TODO:Helper methods---------TODO:Helper methods
     //TODO:Helper methods---------TODO:Helper methods
