@@ -1,18 +1,91 @@
-package com.kzcse.pyramidvisulizer.opengl;
+package com.kzcse.pyramidvisulizer.opengl.`object`;
 
 
 import android.opengl.GLES30
+import android.opengl.Matrix
 import android.util.Log
+import com.kzcse.pyramidvisulizer.opengl.Colors
+import com.kzcse.pyramidvisulizer.opengl.renderer.Renderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+class PyramidRenderer {
+    private val pyramidModelMatrix = FloatArray(16)
+    private val pyramidMVPMatrix = FloatArray(16)
+    private val pyramidPositionInScreenSpace = FloatArray(4) // To store pyramid's screen position
+
+    var x: Float = 0f
+
+    var y: Float = 0f
+    var zPosition: Float = 0f
+
+    // Define the pyramid's size in world space
+    private val pyramidWidth: Float = 2.0f
+    private val pyramidHeight: Float = 2.0f
+
+    init {
+        initializeModelMatrix()
+    }
+
+    private fun initializeModelMatrix() {
+        Matrix.setIdentityM(pyramidModelMatrix, 0)
+    }
+
+    private fun setPosition() {
+        Matrix.setIdentityM(pyramidModelMatrix, 0)
+        Matrix.translateM(pyramidModelMatrix, 0, x, y, zPosition)
+    }
+
+    private fun setScale() {
+        Matrix.scaleM(pyramidModelMatrix, 0, pyramidWidth, pyramidHeight, 2.0f) // Assuming some depth scale
+    }
+
+    private fun applyGlobalTransformations(globalTransformMatrix: FloatArray) {
+        Matrix.multiplyMM(pyramidModelMatrix, 0, globalTransformMatrix, 0, pyramidModelMatrix, 0)
+    }
+
+    private fun computeMVPMatrix(vpMatrix: FloatArray) {
+        Matrix.multiplyMM(pyramidMVPMatrix, 0, vpMatrix, 0, pyramidModelMatrix, 0)
+    }
+
+    fun draw(vpMatrix: FloatArray, globalTransformMatrix: FloatArray, pyramid: Pyramid) {
+        setPosition()
+        setScale()
+        applyGlobalTransformations(globalTransformMatrix)
+        computeMVPMatrix(vpMatrix)
+        pyramid.draw(pyramidMVPMatrix)
+    }
+
+
+    fun isPyramidTouched(vpMatrix: FloatArray, touchX: Float, touchY: Float, screenWidth: Int, screenHeight: Int): Boolean {
+        // Transform the pyramid's position to screen coordinates
+        val pyramidPosition = floatArrayOf(x, y, zPosition, 1f)
+        Matrix.multiplyMV(pyramidPositionInScreenSpace, 0, vpMatrix, 0, pyramidPosition, 0)
+
+        // Normalize the screen coordinates (divide by w)
+        val screenX = (pyramidPositionInScreenSpace[0] / pyramidPositionInScreenSpace[3] + 1) / 2 * screenWidth
+        val screenY = (1 - (pyramidPositionInScreenSpace[1] / pyramidPositionInScreenSpace[3] + 1) / 2) * screenHeight
+        println(
+            "TappedPosition:ScreenCoordinate: ($screenX, $screenY):"
+        )
+        // Calculate the bounds of the pyramid in screen space
+        val pyramidScreenWidth = pyramidWidth / 2 * screenWidth
+        val pyramidScreenHeight = pyramidHeight / 2 * screenHeight
+
+        // Check if the touch point is within the pyramid's screen-space bounds
+        return touchX in (screenX - pyramidScreenWidth)..(screenX + pyramidScreenWidth) &&
+                touchY in (screenY - pyramidScreenHeight)..(screenY + pyramidScreenHeight)
+    }
+}
+
+
 
 class Pyramid {
 
     private var mProgramObject: Int = 0
     private var mMVPMatrixHandle: Int = 0
     private var mColorHandle: Int = 0
-    private lateinit var mVertices: FloatBuffer
+    private var mVertices: FloatBuffer
 
     // Initial size of the pyramid, set here for easy modification later
     private val size = 0.4f

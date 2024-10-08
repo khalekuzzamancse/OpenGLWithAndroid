@@ -1,10 +1,48 @@
-package com.kzcse.pyramidvisulizer.opengl
+package com.kzcse.pyramidvisulizer.opengl.`object`
 
 import android.opengl.GLES30
+import android.opengl.Matrix
 import android.util.Log
+import com.kzcse.pyramidvisulizer.opengl.renderer.Renderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+class SandDunesRenderer {
+    private val sandDunesModelMatrix = FloatArray(16)
+    private val sandDunesMVPMatrix = FloatArray(16)
+
+    init {
+        initializeModelMatrix()
+    }
+
+    private fun initializeModelMatrix() {
+        Matrix.setIdentityM(sandDunesModelMatrix, 0)
+    }
+
+    private fun setPosition() {
+        Matrix.setIdentityM(sandDunesModelMatrix, 0)
+    }
+
+    private fun setScale() {
+        Matrix.scaleM(sandDunesModelMatrix, 0, 10f, 1f, 10f)
+    }
+
+    private fun applyGlobalTransformations(globalTransformMatrix: FloatArray) {
+        Matrix.multiplyMM(sandDunesModelMatrix, 0, globalTransformMatrix, 0, sandDunesModelMatrix, 0)
+    }
+
+    private fun computeMVPMatrix(vpMatrix: FloatArray) {
+        Matrix.multiplyMM(sandDunesMVPMatrix, 0, vpMatrix, 0, sandDunesModelMatrix, 0)
+    }
+
+    fun draw(vpMatrix: FloatArray, globalTransformMatrix: FloatArray, sandDunes: SandDunes) {
+        setPosition()
+        setScale()
+        applyGlobalTransformations(globalTransformMatrix)
+        computeMVPMatrix(vpMatrix)
+        sandDunes.draw(sandDunesMVPMatrix)
+    }
+}
 
 class SandDunes {
 

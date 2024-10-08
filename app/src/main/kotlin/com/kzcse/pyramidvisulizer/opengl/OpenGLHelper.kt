@@ -9,7 +9,7 @@ import androidx.activity.ComponentActivity
 
 class OpenGLHelper(private val context: Context) {
 
-    fun isOpenGLES30Supported(): Boolean {
+    private fun isOpenGLES30Supported(): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val configurationInfo: ConfigurationInfo = activityManager.deviceConfigurationInfo
         return configurationInfo.reqGlEsVersion >= 0x30000
