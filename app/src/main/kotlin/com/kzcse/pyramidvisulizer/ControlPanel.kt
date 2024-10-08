@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ControlPanel(
+    modifier: Modifier,
     onRotateX: () -> Unit,
     onRotateY: () -> Unit,
     onRotateZ: () -> Unit,
@@ -28,9 +29,8 @@ fun ControlPanel(
     var expanded by remember { mutableStateOf(true) }  // Toggle for showing/hiding controls
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)  // Less padding for compactness
+        modifier = modifier
+    // Less padding for compactness
     ) {
         // Header with toggle button
         Row(
